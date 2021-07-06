@@ -76,8 +76,8 @@ message = ""
     .finally(() => $.done())
 
 
-async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
-  await $.wait(20)
+function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
+  //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"taskId":"${taskId}","inviteType":"${inviteType}","inviterPin":"${inviterPin}","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1625480372020&appid=activities_platform`,`joyBaseInfo`), async (err, resp, data) => {
       try {
@@ -99,7 +99,7 @@ async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
 }
 
 async function getJoyList(){
-  await $.wait(20)
+  //await $.wait(20)
   return new Promise(resolve => {
     $.get(taskGetClientActionUrl(`appid=activities_platform&body={"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`joyList`), async (err, resp, data) => {
       try {
@@ -110,12 +110,12 @@ async function getJoyList(){
           data = JSON.parse(data);
           $.log(`\n===== 【京东账号${$.index}】${$.nickName || $.UserName} joy 状态 start =====`)
           $.log("在逛街的joy⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️")
-          for (const activityJoyListElement of data.data.activityJoyList) {
-            $.log(`id:${activityJoyListElement.id}|name: ${activityJoyListElement.name}|level: ${activityJoyListElement.level}`)
+          for (let i = 0; i < data.data.activityJoyList.length; i++) {
+            $.log(`id:${data.data.activityJoyList[i].id}|name: ${data.data.activityJoyList[i].name}|level: ${data.data.activityJoyList[i].level}`)
           }
           $.log("\n在铲土的joy⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️")
-          for (const workJoyInfoListElement of data.data.workJoyInfoList) {
-            $.log(`工位: ${workJoyInfoListElement.location} [${workJoyInfoListElement.unlock ? `已开` : `未开`}]|joy= ${workJoyInfoListElement.joyDTO ? `id:${workJoyInfoListElement.joyDTO.id}|name: ${workJoyInfoListElement.joyDTO.name}|level: ${workJoyInfoListElement.joyDTO.level}` : `毛都没有`}`)
+          for (let i = 0; i < data.data.workJoyInfoList.length; i++) {
+            $.log(`工位: ${data.data.workJoyInfoList[i].location} [${data.data.workJoyInfoList[i].unlock ? `已开` : `未开`}]|joy= ${data.data.workJoyInfoList[i].joyDTO ? `id:${data.data.workJoyInfoList[i].joyDTO.id}|name: ${data.data.workJoyInfoList[i].joyDTO.name}|level: ${data.data.workJoyInfoList[i].joyDTO.level}` : `毛都没有`}`)
           }
           $.log(`===== 京东账号${$.index}】${$.nickName || $.UserName} joy 状态  end  =====\n`)
           $.activityJoyList = data.data.activityJoyList
@@ -131,8 +131,8 @@ async function getJoyList(){
   })
 }
 
-async function getGameShopList(){
-  await $.wait(20)
+function getGameShopList(){
+  //await $.wait(20)
   return new Promise(resolve => {
     $.get(taskGetClientActionUrl(`appid=activities_platform&body={"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`gameShopList`), async (err, resp, data) => {
       try {
@@ -152,15 +152,17 @@ async function getGameShopList(){
   })
 }
 
-async function doJoyMoveUpAll(activityJoyList,workJoyInfoList) {
+async function doJoyMoveUpAll(activityJoyList, workJoyInfoList) {
   let workJoyInfoUnlockList = workJoyInfoList.filter(row => row.unlock && row.joyDTO === null)
   if (activityJoyList.length !== 0 && workJoyInfoUnlockList.length !== 0) {
-    let maxLevelJoy = Math.max.apply(Math, activityJoyList.map(function(o) {return o.level}))
+    let maxLevelJoy = Math.max.apply(Math, activityJoyList.map(function (o) {
+      return o.level
+    }))
     let maxLevelJoyList = activityJoyList.filter(row => row.level === maxLevelJoy)
     $.log(`下地干活！ joyId= ${maxLevelJoyList[0].id} location= ${workJoyInfoUnlockList[0].location}`)
     await doJoyMove(maxLevelJoyList[0].id, workJoyInfoUnlockList[0].location)
     await getJoyList()
-    await doJoyMoveUpAll($.activityJoyList,$.workJoyInfoList)
+    await doJoyMoveUpAll($.activityJoyList, $.workJoyInfoList)
   }
   $.log(`下地完成了！`)
 }
@@ -170,10 +172,10 @@ async function doJoyMoveDownAll(workJoyInfoList) {
     $.log(`工位清理完成！`)
     return true
   }
-  for (let workJoyInfoListElement of workJoyInfoList) {
-    if (workJoyInfoListElement.unlock && workJoyInfoListElement.joyDTO) {
-      $.log(`从工位移除 => id:${workJoyInfoListElement.joyDTO.id}|name: ${workJoyInfoListElement.joyDTO.name}|level: ${workJoyInfoListElement.joyDTO.level}`)
-      await doJoyMove(workJoyInfoListElement.joyDTO.id, 0)
+  for (let i = 0; i < workJoyInfoList.length; i++) {
+    if (workJoyInfoList[i].unlock && workJoyInfoList[i].joyDTO) {
+      $.log(`从工位移除 => id:${workJoyInfoList[i].joyDTO.id}|name: ${workJoyInfoList[i].joyDTO.name}|level: ${workJoyInfoList[i].joyDTO.level}`)
+      await doJoyMove(workJoyInfoList[i].joyDTO.id, 0)
     }
   }
   //check
@@ -182,7 +184,9 @@ async function doJoyMoveDownAll(workJoyInfoList) {
 }
 
 async function doJoyMergeAll(activityJoyList) {
-  let minLevel = Math.min.apply(Math, activityJoyList.map(function(o) {return o.level}))
+  let minLevel = Math.min.apply(Math, activityJoyList.map(function (o) {
+    return o.level
+  }))
   let joyMinLevelArr = activityJoyList.filter(row => row.level === minLevel);
 
   let gameShopList = await getGameShopList()
@@ -196,14 +200,14 @@ async function doJoyMergeAll(activityJoyList) {
     await doJoyMerge(joyMinLevelArr[0].id, joyMinLevelArr[1].id);
     await getJoyList()
     await doJoyMergeAll($.activityJoyList)
-  }else if(joyMinLevelArr.length === 1 && joyMinLevelArr[0].level < fastBuyLevel){
+  } else if (joyMinLevelArr.length === 1 && joyMinLevelArr[0].level < fastBuyLevel) {
     let buyResp = await doJoyBuy(joyMinLevelArr[0].level);
     if (buyResp.success) {
       await getJoyList();
       await doJoyMergeAll($.activityJoyList);
     } else {
       $.log("没钱了上位吧！")
-      await doJoyMoveUpAll($.activityJoyList,$.workJoyInfoList)
+      await doJoyMoveUpAll($.activityJoyList, $.workJoyInfoList)
     }
   } else {
     $.log(`没有需要合成的joy 开始买买买🛒🛒🛒🛒🛒🛒🛒🛒`)
@@ -214,13 +218,13 @@ async function doJoyMergeAll(activityJoyList) {
       await doJoyMergeAll($.activityJoyList);
     } else {
       $.log("没钱了上位吧！")
-      await doJoyMoveUpAll($.activityJoyList,$.workJoyInfoList)
+      await doJoyMoveUpAll($.activityJoyList, $.workJoyInfoList)
     }
   }
 }
 
-async function doJoyMove(joyId,location){
-  await $.wait(20)
+function doJoyMove(joyId,location){
+  //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskGetClientActionUrl(`body={"joyId":${joyId},"location":${location},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyMove`), async (err, resp, data) => {
       try {
@@ -239,8 +243,8 @@ async function doJoyMove(joyId,location){
   })
 }
 
-async function doJoyMerge(joyId1,joyId2){
-  await $.wait(20)
+function doJoyMerge(joyId1,joyId2){
+  //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskGetClientActionUrl(`body={"joyOneId":${joyId1},"joyTwoId":${joyId2},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyMerge`), async (err, resp, data) => {
       try {
@@ -259,8 +263,8 @@ async function doJoyMerge(joyId1,joyId2){
   })
 }
 
-async function doJoyBuy(level){
-  await $.wait(20)
+function doJoyBuy(level){
+  //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"level":${level},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyBuy`), async (err, resp, data) => {
       try {
