@@ -1,15 +1,13 @@
 /*
-
-从CK1 开始开工位 1开满了开2 如此类推
-
 更新地址：https://github.com/Tsukasa007/my_script
 ============Quantumultx===============
 [task_local]
-#汪汪乐园开工位
-0 0 9 * * * https://x.js, tag=汪汪乐园开工位, img-url=https://x.png, enabled=true
+#汪汪乐园养joy
+0 0 9 * * * https://x.js, tag=汪汪乐园养joy, img-url=https://x.png, enabled=true
 */
-const $ = new Env('汪汪乐园开工位');
+const $ = new Env('汪汪乐园养joy');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+// cupExid = $.isNode() ? (process.env.Cupexid ? process.env.Cupexid : 38) : ($.getdata("Cupexid") ? $.getdata("Cupexid") : 38);
 
 const notify = $.isNode() ? require('./sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
@@ -24,11 +22,9 @@ if ($.isNode()) {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
-$.invitePinTaskList = []
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
-$.shareuuid = "W2j9nfW7Jzo5M5HApothz_CpgfyjcIG11hM6fOtM3es" //wen总的助力码
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
@@ -43,89 +39,34 @@ $.shareuuid = "W2j9nfW7Jzo5M5HApothz_CpgfyjcIG11hM6fOtM3es" //wen总的助力码
       $.index = i + 1;
       $.isLogin = true;
       $.nickName = '';
-      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+      console.log(`\n\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+
+      let joyBaseInfo = await getJoyBaseInfo();
+      let nowLevel = joyBaseInfo.level
+      let activityJoyList,workJoyInfoList;
+      $.activityJoyList = []
+      $.workJoyInfoList = []
+      await getJoyList();
+
+      let gameShopList = await getGameShopList()
+      //清理工位
+      await doJoyMoveDownAll($.workJoyInfoList)
+
+      //从低合到高
+      await doJoyMergeeAll($.activityJoyList)
+      //购买合成
 
 
-      $.openIndex = 0
 
-      //开工位
-      if ($.index >= 2) {
-        $.log(`帮 ${$.UserName} 开工位 :`)
-        let resp = await getJoyBaseInfo( undefined, 2, $.invitePinTaskList[$.openIndex]);
-        if (resp.data && resp.data.helpState && resp.data.helpState === 1) {
-          $.log("开工位成功！");
-        }else if (resp.data && resp.data.helpState && resp.data.helpState === 3) {
-          $.log("你不是新用户了，开🐔八开！");
-        }else if (resp.data && resp.data.helpState && resp.data.helpState === 2){
-          $.log(`ck ${$.index} -  ${$.UserName} 开满了不开了`);
-          $.openIndex++
-        }else {
-          $.log("开工位失败！");
-        }
-        $.log("\n")
-      }
 
-      await getJoyBaseInfo()
-      if ($.joyBaseInfo && $.joyBaseInfo.invitePin) {
-        $.log(`${$.name} - ${$.UserName}  助力码: ${$.joyBaseInfo.invitePin}`);
-        $.invitePinTaskList.push($.joyBaseInfo.invitePin);
-      } else {
-        $.log(`${$.name} - ${$.UserName}  助力码: null`);
-        $.invitePinTaskList.push('');
-        $.isLogin = false
-      }
 
-      if (!$.isLogin) {
-        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
-          "open-url": "https://bean.m.jd.com/bean/signIndex.action"
-        });
-        if ($.isNode()) {
-          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-        }
-        continue
-      }
     }
   }
-
-
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
-//获取活动信息
 
-//任务列表
-function getTaskList() {
-  return new Promise(resolve => {
-    $.post(taskPostClientActionUrl(`body=%7B%22linkId%22%3A%22LsQNxL7iWDlXUs6cFl-AAg%22%7D&appid=activities_platform`,`apTaskList`), async (err, resp, data) => {
-      $.log('=== 任务列表 start ===')
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data);
-          $.taskList = data.data
-          $.taskList.forEach( row =>{
-            $.log(`${row.taskTitle} ${row.taskDoTimes}/${row.taskLimitTimes}`)
-          })
-          $.log('=== 任务列表 end  ===')
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
 
-/**
- * 互助
- * @param taskId
- * @param inviteType
- * @param inviterPin
- * @returns {Promise<unknown>}
- */
 async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
   await $.wait(1000)
   return new Promise(resolve => {
@@ -136,28 +77,62 @@ async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
+          $.log(`等级: ${data.data.level}|金币: ${data.data.joyCoin}`)
           $.joyBaseInfo = data.data
         }
       } catch (e) {
         $.logErr(e, resp)
       } finally {
-        resolve(data);
+        resolve($.joyBaseInfo);
       }
     })
   })
 }
 
-
-async function apDoTask(taskId,taskType,itemId) {
-  await $.wait(1000)
+async function getJoyList(){
+  await $.wait(2000)
   return new Promise(resolve => {
-    $.post(taskPostClientActionUrl(`body={"taskType":"${taskType}","taskId":${taskId},"channel":4,"linkId":"LsQNxL7iWDlXUs6cFl-AAg","itemId":"${itemId}"}&appid=activities_platform`,`apDoTask`), async (err, resp, data) => {
+    $.get(taskGetClientActionUrl(`appid=activities_platform&body={"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`joyList`), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
+          $.log(`\n===== 【京东账号${$.index}】${$.nickName || $.UserName} joy 状态 start =====`)
+          $.log("在逛街的joy⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️")
+          for (const activityJoyListElement of data.data.activityJoyList) {
+            $.log(`id:${activityJoyListElement.id}|name: ${activityJoyListElement.name}|level: ${activityJoyListElement.level}`)
+          }
+          $.log("\n在铲土的joy⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️")
+          for (const workJoyInfoListElement of data.data.workJoyInfoList) {
+            $.log(`工位: ${workJoyInfoListElement.location} [${workJoyInfoListElement.unlock ? `已开` : `未开`}]|joy= ${workJoyInfoListElement.joyDTO ? `id:${workJoyInfoListElement.joyDTO.id}|name: ${workJoyInfoListElement.joyDTO.name}|level: ${workJoyInfoListElement.joyDTO.level}` : `毛都没有`}`)
+          }
+          $.log(`===== 京东账号${$.index}】${$.nickName || $.UserName} joy 状态  end  =====\n`)
+          $.activityJoyList = data.data.activityJoyList
+          $.workJoyInfoList = data.data.workJoyInfoList
+
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data.data);
+      }
+    })
+  })
+}
+
+async function getGameShopList(){
+  await $.wait(1000)
+  return new Promise(resolve => {
+    $.get(taskGetClientActionUrl(`appid=activities_platform&body={"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}`,`gameShopList`), async (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          //排除不能购买的
+          data = JSON.parse(data).data.filter(row => row.shopStatus === 1);
         }
       } catch (e) {
         $.logErr(e, resp)
@@ -168,38 +143,94 @@ async function apDoTask(taskId,taskType,itemId) {
   })
 }
 
-async function apTaskDetail(taskId,taskType) {
+async function doJoyMoveDownAll(workJoyInfoList) {
+  if (workJoyInfoList.filter(row => row.joyDTO).length === 0) {
+    $.log(`工位清理完成！`)
+    return true
+  }
+  for (let workJoyInfoListElement of workJoyInfoList) {
+    if (workJoyInfoListElement.unlock && workJoyInfoListElement.joyDTO) {
+      $.log(`从工位移除 => id:${workJoyInfoListElement.joyDTO.id}|name: ${workJoyInfoListElement.joyDTO.name}|level: ${workJoyInfoListElement.joyDTO.level}`)
+      await doJoyMove(workJoyInfoListElement.joyDTO.id, 0)
+    }
+  }
+  //check
+  await getJoyList()
+  await doJoyMoveDownAll($.workJoyInfoList)
+}
+
+async function doJoyMergeeAll(activityJoyList) {
+  let minLevel = Math.min.apply(Math, activityJoyList.map(function(o) {return o.level}))
+  let joyMinLevelArr = activityJoyList.filter(row => row.level === minLevel);
+  if (joyMinLevelArr.length >= 2) {
+    $.log(`开始合成 ${minLevel} ${joyMinLevelArr[0].id} <=> ${joyMinLevelArr[1].id}`);
+    await doJoyMergee(joyMinLevelArr[0].id, joyMinLevelArr[1].id);
+    await getJoyList()
+    await doJoyMergeeAll($.activityJoyList)
+  } else {
+    $.log(`没有需要合成的joy 开始买买买🛒🛒🛒🛒🛒🛒🛒🛒`)
+    let joyBaseInfo = await getJoyBaseInfo()
+    let fastBuyLevel = joyBaseInfo.fastBuyLevel
+    $.log(`现在最高可以购买: ${fastBuyLevel}  购买 ${fastBuyLevel} 的joy   你还有${joyBaseInfo.joyCoin}金币`)
+    let buyResp = await doJoyBuy(fastBuyLevel);
+    if (buyResp.success) {
+      await getJoyList();
+      await doJoyMergeeAll($.activityJoyList)
+    }
+  }
+}
+
+async function doJoyMove(joyId,location){
   await $.wait(1000)
   return new Promise(resolve => {
-    $.post(taskPostClientActionUrl(`functionId=apTaskDetail&body={"taskType":"${taskType}","taskId":${taskId},"channel":4,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`apTaskDetail`), async (err, resp, data) => {
+    $.post(taskGetClientActionUrl(`body={"joyId":${joyId},"location":${location},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyMove`), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
-          $.taskDetailList = data.data.taskItemList
         }
       } catch (e) {
         $.logErr(e, resp)
       } finally {
-        resolve(data.data.taskItemList);
+        resolve(data.data);
       }
     })
   })
 }
 
-async function apTaskDrawAward(taskId,taskType) {
+async function doJoyMergee(joyId1,joyId2){
+  await $.wait(4000)
+  return new Promise(resolve => {
+    $.post(taskGetClientActionUrl(`body={"joyOneId":${joyId1},"joyTwoId":${joyId2},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyMerge`), async (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          data = JSON.parse(data);$.log(`合成 ${joyId1} <=> ${joyId2} ${data.success ? `成功！` : `失败！${data.errMsg} code=${data.code}`}`)
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data.data);
+      }
+    })
+  })
+}
+
+async function doJoyBuy(level){
   await $.wait(1000)
   return new Promise(resolve => {
-    $.post(taskPostClientActionUrl(`body={"taskType":"${taskType}","taskId":${taskId},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`apTaskDrawAward`), async (err, resp, data) => {
+    $.post(taskPostClientActionUrl(`body={"level":${level},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`joyBuy`), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
-          $.log("领取奖励")
+          $.log(`购买joy level: ${level} ${data.success ? `成功！` : `失败！`}`)
         }
       } catch (e) {
         $.logErr(e, resp)
@@ -209,27 +240,13 @@ async function apTaskDrawAward(taskId,taskType) {
     })
   })
 }
-
-
-function generateShareUrl(inviterId) {
-  return "" +
-      "https://black.jd.com/wybteg/vqqo?jumpPath=https%3A%2F%2Fjoypark.jd.com%3FactivityId%3D" +
-      "LsQNxL7iWDlXUs6cFl-AAg" + //activityId
-      "%26" +
-      "inviterId%3D" +
-      inviterId +//inviteType
-      "%26inviteType%3D1%26taskId%3D167%26enter%3Ddefaultshare&dlChannel=superjd-mjsb-wwly&autoOpen=1&video=wwly"
-
-}
-
-
 
 function taskPostClientActionUrl(body,functionId) {
   return {
     url: `https://api.m.jd.com/client.action?${functionId?`functionId=${functionId}`:``}`,
     body: body,
     headers: {
-      'User-Agent':'jdltapp;iPhone;3.5.6;14.6;eac3e15e91fd380664fc7c788e8ab6a07805646d;network/4g;ADID/8F6CAEEA-5BF7-4F7E-86C3-A641C19CA832;hasUPPay/0;pushNoticeIsOpen/0;lang/zh_CN;model/iPhone13,2;addressid/1995295948;hasOCPay/0;appBuild/1070;supportBestPay/0;pv/41.26;apprpd/;ref/JDLTSubMainPageViewController;psq/2;ads/;psn/eac3e15e91fd380664fc7c788e8ab6a07805646d|112;jdv/0|kong|t_1000509960_|jingfen|bb9c79e4c4174521873879a27a707da4|1625071927291|1625071930;adk/;app_device/IOS;pap/JA2020_3112531|3.5.6|IOS 14.6;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+      'User-Agent':'jdltapp;iPhone;3.5.6;14.6;eac3e15e91fd380664fc7c788e8ab6a07805646d;network/4g;ADID/8F6CAEEA-5BF7-4F7E-86C3-A641C19CA832;hasUPPay/0;pushNoticeIsOpen/0;lang/zh_CN;model/iPhone13,2;addressid/1995295948;hasOCPay/0;appBuild/1070;supportBestPay/0;pv/41.26;apprpd/;ref/JDLTSubMainPageViewController;psq/2;ads/;psn/eac3e15e91fd380664fc7c788e8ab6a07805646d|112;jdv/0|kong|t_1500509960_|jingfen|bb9c79e4c4174521873879a27a707da4|1625071927291|1625071930;adk/;app_device/IOS;pap/JA2020_3112531|3.5.6|IOS 14.6;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
       'Content-Type':'application/x-www-form-urlencoded',
       'Host':'api.m.jd.com',
       'Origin':'https://joypark.jd.com',
@@ -238,6 +255,22 @@ function taskPostClientActionUrl(body,functionId) {
     }
   }
 }
+
+function taskGetClientActionUrl(body,functionId) {
+  return {
+    url: `https://api.m.jd.com/client.action?functionId=${functionId}${body ? `&${body}` : ``}`,
+    // body: body,
+    headers: {
+      'User-Agent':'jdltapp;iPhone;3.5.6;14.6;eac3e15e91fd380664fc7c788e8ab6a07805646d;network/4g;ADID/8F6CAEEA-5BF7-4F7E-86C3-A641C19CA832;hasUPPay/0;pushNoticeIsOpen/0;lang/zh_CN;model/iPhone13,2;addressid/1995295948;hasOCPay/0;appBuild/1070;supportBestPay/0;pv/41.26;apprpd/;ref/JDLTSubMainPageViewController;psq/2;ads/;psn/eac3e15e91fd380664fc7c788e8ab6a07805646d|112;jdv/0|kong|t_1500509960_|jingfen|bb9c79e4c4174521873879a27a707da4|1625071927291|1625071930;adk/;app_device/IOS;pap/JA2020_3112531|3.5.6|IOS 14.6;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+      'Content-Type':'application/x-www-form-urlencoded',
+      'Host':'api.m.jd.com',
+      'Origin':'https://joypark.jd.com',
+      'Referer':'https://joypark.jd.com/?activityId=LsQNxL7iWDlXUs6cFl-AAg&lng=113.387899&lat=22.512678&sid=4d76080a9da10fbb31f5cd43396ed6cw&un_area=19_1657_52093_0',
+      'Cookie': cookie,
+    }
+  }
+}
+
 function jsonParse(str) {
   if (typeof str == "string") {
     try {
