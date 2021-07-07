@@ -157,6 +157,7 @@ message = ""
         }
         continue
       }
+      $.log(JSON.stringify($.invitePinTaskList))
       for (const invitePinTaskListKey of $.invitePinTaskList) {
         $.log(`【京东账号${$.index}】${$.nickName || $.UserName} 助力 ${invitePinTaskListKey}`)
         let resp = await getJoyBaseInfo(167,1,invitePinTaskListKey);
@@ -219,7 +220,7 @@ function getTaskList() {
  * @param inviterPin
  * @returns {Promise<unknown>}
  */
-async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
+function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"taskId":"${taskId}","inviteType":"${inviteType}","inviterPin":"${inviterPin}","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1625480372020&appid=activities_platform`,`joyBaseInfo`), async (err, resp, data) => {
@@ -229,15 +230,14 @@ async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
-          // if (inviterPin) {
-          //   $.log(JSON.stringify(data))
-          // }
           $.joyBaseInfo = data.data
         }
       } catch (e) {
         $.logErr(e, resp)
       } finally {
+        $.log(`resolve start`)
         resolve(data);
+        $.log(`resolve end`)
       }
     })
   })
