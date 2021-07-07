@@ -10,7 +10,6 @@
 */
 const $ = new Env('汪汪乐园每日任务');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-// cupExid = $.isNode() ? (process.env.Cupexid ? process.env.Cupexid : 38) : ($.getdata("Cupexid") ? $.getdata("Cupexid") : 38);
 
 const notify = $.isNode() ? require('./sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
@@ -25,8 +24,7 @@ if ($.isNode()) {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
-// 汪汪乐园 助力作者2个号，放心一般都是满的，爱护作者，人人有责
-$.invitePinTaskList = ['W2j9nfW7Jzo5M5HApothz_CpgfyjcIG11hM6fOtM3es','cQoPKkkid0zr22o7Oej5yO0IMMy8J5ssaaGBRxTyspo']
+$.invitePinTaskList = []
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
@@ -38,7 +36,6 @@ message = ""
     return;
   }
   for (let i = 0; i < cookiesArr.length; i++) {
-    $.wait(50)
     cookie = cookiesArr[i];
     if (cookie) {
       $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
@@ -46,23 +43,6 @@ message = ""
       $.isLogin = true;
       $.nickName = '';
       console.log(`\n\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-
-
-      // //开工位
-      // if ($.index >= 2) {
-      //   $.log(`帮 ${$.UserName} 开工位 :`)
-      //   let resp = await getJoyBaseInfo( undefined, 2, $.invitePinTaskList[$.openIndex]);
-      //   if (resp.data && resp.data.helpState && resp.data.helpState === 1) {
-      //     $.log("开工位成功！");
-      //   }else if (resp.data && resp.data.helpState && resp.data.helpState === 3) {
-      //     $.log("你不是新用户了，开🐔八开！");
-      //   }else if (resp.data && resp.data.helpState && resp.data.helpState === 2){
-      //     $.log(`ck ${$.index} -  ${$.UserName} 开满了不开了`);
-      //     $.openIndex++
-      //   }else {
-      //     $.log("开工位失败！");
-      //   }
-      // }
 
       await getJoyBaseInfo()
 
@@ -91,7 +71,6 @@ message = ""
 
       // 签到 / 逛会场 / 浏览商品
       for (const task of $.taskList) {
-        $.wait(50)
         if (task.taskType === 'SIGN') {
           $.log(`${task.taskTitle} 签到`)
           await apDoTask(task.id,task.taskType,undefined);
@@ -131,7 +110,6 @@ message = ""
           }
           //领
           for (let j = 0; j < task.taskLimitTimes; j++) {
-            $.wait(50)
             let resp = await apTaskDrawAward(task.id,task.taskType);
 
             if (!resp.success) {
@@ -141,7 +119,6 @@ message = ""
           }
         }else if (task.taskType === 'SHARE_INVITE') {
           for (let j = 0; j < 5; j++) {
-            $.wait(50)
             let resp = await apTaskDrawAward(167,'SHARE_INVITE');
 
             if (!resp.success) {
@@ -157,63 +134,53 @@ message = ""
   }
 
   $.log("\n\n内部汪汪乐园互助")
-  try {
-    for (let i = 0; i < cookiesArr.length; i++) {
-      $.wait(50)
-      cookie = cookiesArr[i];
-      if (cookie) {
-        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-        $.index = i + 1;
-        $.isLogin = true;
-        $.nickName = '';
-        console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-        if (!$.isLogin) {
-          $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
-            "open-url": "https://bean.m.jd.com/bean/signIndex.action"
-          });
-          if ($.isNode()) {
-            await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-          }
-          continue
+  for (let i = 0; i < cookiesArr.length; i++) {
+    cookie = cookiesArr[i];
+    if (cookie) {
+      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+      $.index = i + 1;
+      $.isLogin = true;
+      $.nickName = '';
+      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+      if (!$.isLogin) {
+        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
+          "open-url": "https://bean.m.jd.com/bean/signIndex.action"
+        });
+        if ($.isNode()) {
+          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
         }
-        for (const invitePinTaskListKey of $.invitePinTaskList) {
-          $.wait(50)
-          $.log(`【京东账号${$.index}】${$.nickName || $.UserName} 助力 ${invitePinTaskListKey}`)
-          let resp = await getJoyBaseInfo(167,1,invitePinTaskListKey);
-
-          if (resp.success) {
-            if (resp.data.helpState === 1) {
-              $.log("助力成功！");
-            } else if (resp.data.helpState === 0){
-              $.log("自己不能助力自己！");
-            } else if (resp.data.helpState === 2){
-              $.log("助力过了！");
-            } else if (resp.data.helpState === 3){
-              $.log("没有助力次数了！");
-              break
-            }else if (resp.data.helpState === 4){
-              $.log("这个B助力满了！");
-            }
-          }else {
-            $.log("数据异常 助力失败！\n\n")
+        continue
+      }
+      for (const invitePinTaskListKey of $.invitePinTaskList) {
+        $.log(`【京东账号${$.index}】${$.nickName || $.UserName} 助力 ${invitePinTaskListKey}`)
+        let resp = await getJoyBaseInfo(167,1,invitePinTaskListKey);
+        if (resp.success) {
+          if (resp.data.helpState === 1) {
+            $.log("助力成功！");
+          } else if (resp.data.helpState === 0){
+            $.log("自己不能助力自己！");
+          } else if (resp.data.helpState === 2){
+            $.log("助力过了！");
+          } else if (resp.data.helpState === 3){
+            $.log("没有助力次数了！");
             break
+          }else if (resp.data.helpState === 4){
+            $.log("这个B助力满了！");
           }
+        }else {
+          $.log("数据异常 助力失败！\n\n")
+          break
         }
       }
     }
-  }catch (e){
-    $.log("XXXXXXXXXXX")
-    $.logErr(e)
   }
-
-
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 //获取活动信息
 
 //任务列表
-async function getTaskList() {
+function getTaskList() {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body=%7B%22linkId%22%3A%22LsQNxL7iWDlXUs6cFl-AAg%22%7D&appid=activities_platform`, `apTaskList`), async (err, resp, data) => {
@@ -225,9 +192,9 @@ async function getTaskList() {
         } else {
           data = JSON.parse(data);
           $.taskList = data.data
-          $.taskList.forEach(row => {
+          for (const row of $.taskList) {
             $.log(`${row.taskTitle} ${row.taskDoTimes}/${row.taskLimitTimes}`)
-          })
+          }
           $.log('=== 任务列表 end  ===')
         }
       } catch (e) {
@@ -246,7 +213,7 @@ async function getTaskList() {
  * @param inviterPin
  * @returns {Promise<unknown>}
  */
-async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
+function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"taskId":"${taskId}","inviteType":"${inviteType}","inviterPin":"${inviterPin}","linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&_t=1625480372020&appid=activities_platform`,`joyBaseInfo`), async (err, resp, data) => {
@@ -271,7 +238,7 @@ async function getJoyBaseInfo(taskId = '',inviteType = '',inviterPin = '') {
 }
 
 
-async function apDoTask(taskId,taskType,itemId = '', appid = 'activities_platform') {
+function apDoTask(taskId,taskType,itemId = '', appid = 'activities_platform') {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"taskType":"${taskType}","taskId":${taskId},"channel":4,"linkId":"LsQNxL7iWDlXUs6cFl-AAg","itemId":"${itemId}"}&appid=${appid}`,`apDoTask`), async (err, resp, data) => {
@@ -291,7 +258,7 @@ async function apDoTask(taskId,taskType,itemId = '', appid = 'activities_platfor
   })
 }
 
-async function apTaskDetail(taskId,taskType) {
+function apTaskDetail(taskId,taskType) {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`functionId=apTaskDetail&body={"taskType":"${taskType}","taskId":${taskId},"channel":4,"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`apTaskDetail`), async (err, resp, data) => {
@@ -320,7 +287,7 @@ async function apTaskDetail(taskId,taskType) {
   })
 }
 
-async function apTaskDrawAward(taskId,taskType) {
+function apTaskDrawAward(taskId,taskType) {
   //await $.wait(20)
   return new Promise(resolve => {
     $.post(taskPostClientActionUrl(`body={"taskType":"${taskType}","taskId":${taskId},"linkId":"LsQNxL7iWDlXUs6cFl-AAg"}&appid=activities_platform`,`apTaskDrawAward`), async (err, resp, data) => {
@@ -340,19 +307,6 @@ async function apTaskDrawAward(taskId,taskType) {
     })
   })
 }
-
-
-function generateShareUrl(inviterId) {
-  return "" +
-      "https://black.jd.com/wybteg/vqqo?jumpPath=https%3A%2F%2Fjoypark.jd.com%3FactivityId%3D" +
-      "LsQNxL7iWDlXUs6cFl-AAg" + //activityId
-      "%26" +
-      "inviterId%3D" +
-      inviterId +//inviteType
-      "%26inviteType%3D1%26taskId%3D167%26enter%3Ddefaultshare&dlChannel=superjd-mjsb-wwly&autoOpen=1&video=wwly"
-
-}
-
 
 
 function taskPostClientActionUrl(body,functionId) {
