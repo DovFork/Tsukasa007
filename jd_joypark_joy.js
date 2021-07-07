@@ -51,14 +51,12 @@ message = ""
       $.maxJoyCount = 10
       console.log(`\n\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
 
-      let joyBaseInfo = await getJoyBaseInfo();
-      let nowLevel = joyBaseInfo.level
-      let activityJoyList,workJoyInfoList;
+      await getJoyBaseInfo();
       $.activityJoyList = []
       $.workJoyInfoList = []
       await getJoyList();
 
-      let gameShopList = await getGameShopList()
+      await getGameShopList()
       //清理工位
       await doJoyMoveDownAll($.workJoyInfoList)
 
@@ -201,8 +199,8 @@ async function doJoyMergeAll(activityJoyList) {
 
   if (joyMinLevelArr.length >= 2) {
     $.log(`开始合成 ${minLevel} ${joyMinLevelArr[0].id} <=> ${joyMinLevelArr[1].id}`);
-    $.log(`限流严重，4秒后合成！`)
-    await $.wait(4000)
+    $.log(`限流严重，5秒后合成！`)
+    await $.wait(5000)
     await doJoyMerge(joyMinLevelArr[0].id, joyMinLevelArr[1].id);
     await getJoyList()
     await doJoyMergeAll($.activityJoyList)
