@@ -128,7 +128,7 @@ if (!process.env.JD_SUMMER_MOM_OPENCARD) {
       if (i === 0 && $.actorUuid) {
         $.shareUuid = $.actorUuid;
       }
-      if ($.index === JD_SUMMER_MOM_OPENCARD) {
+      if ($.index == JD_SUMMER_MOM_OPENCARD) {
         $.log(`你设置到${JD_SUMMER_MOM_OPENCARD} 停止，如果不如意请设置 JD_SUMMER_MOM_OPENCARD变量，注意看js说明！！！没有设置默认11停`)
         break;
       }
@@ -223,8 +223,7 @@ async function startDraw(type) {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
-          $
-          $.log('抽到了： ' + JSON.parse(data))
+          $.log('抽到了： ' + data)
         }
       } catch (e) {
         await $.wait(5000)
