@@ -42,9 +42,9 @@ cron "50 20 * * *" script-path=jd_TW_buff.js,tag=7.28-7.31 特物-拉满BUFF 漂
 7.28-7.31 特物-拉满BUFF 漂亮上场 = type=cron,script-path=jd_TW_buff.js, cronexpr="50 20 * * *", timeout=3600, enable=true
 */
 const $ = new Env('7.28-7.31 特物-拉满BUFF 漂亮上场');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
