@@ -32,9 +32,9 @@ cron "50 0,10 * * *" script-path=jd_opencard_championship.js,tag=7.28-8.6 定格
 7.28-8.6 定格夺冠 = type=cron,script-path=jd_opencard_championship.js, cronexpr="50 0,10 * * *", timeout=3600, enable=true
 */
 const $ = new Env('7.28-8.6 定格夺冠');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
