@@ -14,9 +14,9 @@ https://lzdz-isv.isvjcloud.com/dingzhi/qqxing/pasture/activity?activityId=901210
 */
 const $ = new Env('QQ星系牧场');
 //Node.js用户请在jdCookie.js处填写京东ck;
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
 const randomCount = $.isNode() ? 20 : 5;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('../sendNotify') : '';
 let merge = {}
 let codeList = []
 Exchange = $.isNode() ? (process.env.Cowexchange ? process.env.Cowexchange : false) : ($.getdata("Cowexchange") ? $.getdata("Cowexchange") : false);
@@ -34,7 +34,7 @@ if ($.isNode()) {
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
-$.shareuuid = "" //wen总的助力码
+$.shareuuid = "f431fcc2e98942979f3834508c5cc46e"
     !(async () => {
         if (!cookiesArr[0]) {
             $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
