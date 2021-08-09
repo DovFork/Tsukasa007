@@ -32,9 +32,9 @@ cron "50 0,10 * * *" script-path=jd_summer_mom_opencard.js,tag=7.28-8.9 夏日�
 7.28-8.9 夏日呵护 母音甄选 = type=cron,script-path=jd_summer_mom_opencard.js, cronexpr="50 0,10 * * *", timeout=3600, enable=true
 */
 const $ = new Env('7.28-8.9 夏日呵护 母音甄选');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
