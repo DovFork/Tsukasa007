@@ -32,9 +32,9 @@ cron "50 0 * * *" script-path=jd_olympic_win_gold.js,tag=7.29-8.9 奥运夺金�
 7.29-8.9 奥运夺金挑战赛 = type=cron,script-path=jd_olympic_win_gold.js, cronexpr="50 0 * * *", timeout=3600, enable=true
 */
 const $ = new Env('7.29-8.9 奥运夺金挑战赛');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
