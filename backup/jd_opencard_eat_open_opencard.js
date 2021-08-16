@@ -16,6 +16,7 @@
 入口复制到jd：
 29.0复制整段话 http:/J4rCgGUKdBvsP7 大牌联合送福利，免费领京豆#3BFunBmMVb%=》倞※㚵guang逛
 
+
 更新地址：https://github.com/Tsukasa007/my_script
 ============Quantumultx===============
 [task_local]
@@ -33,9 +34,9 @@ cron "1 1,11 * * *" script-path=jd_opencard_eat_open_opencard.js,tag=7.24-8.15 �
 7.24-8.15 嗨皮一下 食力全开 = type=cron,script-path=jd_opencard_eat_open_opencard.js, cronexpr="1 1,11 * * *", timeout=3600, enable=true
 */
 const $ = new Env('7.24-8.15 嗨皮一下 食力全开');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
