@@ -23,9 +23,9 @@ cron "5 0,5,23 * * *" script-path=jd_opencard_numberOne_8.js,tag=8.10-8.22 头�
 8.10-8.22 头号玩家 一起热8 = type=cron,script-path=jd_opencard_numberOne_8.js, cronexpr="5 0,5,23 * * *", timeout=3600, enable=true
 */
 const $ = new Env('8.10-8.22 头号玩家 一起热8');
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
