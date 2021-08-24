@@ -1,6 +1,7 @@
 /*
 [task_local]
-0 0 1/6 * * ?
+#jd_cookieCheck
+5 0-23/6 * * * ? jd_cookieCheck.js, tag=cookieCheck, img-url=https://raw.githubusercontent.com/tsukasa007/icon/master/cookieCheck.png, enabled=true
  */
 const $ = new Env('CK检测');
 const notify = $.isNode() ? require('./sendNotify') : '';
