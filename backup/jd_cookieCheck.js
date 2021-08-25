@@ -4,9 +4,9 @@
 5 0-23/6 * * * ? jd_cookieCheck.js, tag=cookieCheck, img-url=https://raw.githubusercontent.com/tsukasa007/icon/master/cookieCheck.png, enabled=true
  */
 const $ = new Env('CK检测');
-const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('../sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
 
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
