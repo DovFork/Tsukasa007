@@ -5,14 +5,14 @@
 =================================Quantumultx=========================
 [task_local]
 #京东月资产变动通知
-10 27 * * * https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js, tag=京东月资产变动通知, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
+10 12 27 * * https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js, tag=京东月资产变动通知, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 =================================Loon===================================
 [Script]
-cron "10 27 * * *" script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js,tag=京东月资产变动通知
+cron "10 12 27 * *" script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js,tag=京东月资产变动通知
 ===================================Surge================================
-京东月资产变动通知 = type=cron,cronexp="10 27 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js
+京东月资产变动通知 = type=cron,cronexp="10 12 27 * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js
 ====================================小火箭=============================
-京东月资产变动通知 = type=cron,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js, cronexpr="10 27 * * *", timeout=3600, enable=true
+京东月资产变动通知 = type=cron,script-path=https://raw.githubusercontent.com/jiulan/platypus/main/scripts/jd_all_bean_change.js, cronexpr="10 12 27 * *", timeout=3600, enable=true
  */
 const $ = new Env('京东月资产变动通知');
 const notify = $.isNode() ? require('./sendNotify') : '';
