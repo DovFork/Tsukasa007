@@ -23,9 +23,9 @@ cron "5 0,5,18 * * *" script-path=jd_opencard_Starbucks.js,tag=8.25-8.31 星巴�
 8.25-8.31 星巴克 = type=cron,script-path=jd_opencard_Starbucks.js, cronexpr="5 0,5,18 * * *", timeout=3600, enable=true
 */
 const $ = new Env('8.25-8.31 星巴克');
-const jdCookieNode = $.isNode() ? require('./jdCookieOK.js') : '';
-let UA = require('./USER_AGENTS.js').USER_AGENT;
-const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookieOK.js') : '';
+let UA = require('../USER_AGENTS.js').USER_AGENT;
+const notify = $.isNode() ? require('../sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
