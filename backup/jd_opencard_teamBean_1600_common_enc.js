@@ -3,7 +3,7 @@
 最多20次 最高1600豆
 默认配置随缘参与
 */
-const $ = new Env('8.20 组队瓜分京豆');
+const $ = new Env('通用开卡[1600]');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let UA = require('./USER_AGENTS.js').USER_AGENT;
 const notify = $.isNode() ? require('./sendNotify') : '';
