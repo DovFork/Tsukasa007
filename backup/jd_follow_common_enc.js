@@ -1,7 +1,6 @@
 /*
 通用关注有礼，请先群里设置配置
 */
-process.env.QQ_uid = 819582890
 const $ = new Env('通用关注有礼');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
