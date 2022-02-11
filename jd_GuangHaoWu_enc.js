@@ -7,6 +7,9 @@ Tsukasa
 [task_local]
 #逛好物 赚京豆
 1 1 * * * https://raw.githubusercontent.com/x/scripts/x.js, tag=x, enabled=true
+================Loon==============
+[Script]
+cron "1 1 * * *" script-path=https://raw.githubusercontent.com/x/scripts/x.js,tag=逛好物 赚京豆
 */
 const $ = new Env('逛好物 赚京豆');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
