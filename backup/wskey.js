@@ -29,8 +29,8 @@ const $ = new Env("wskey")
 
     jec = JSON.parse(jec)
     console.log('================')
-    console.log(`jec=${jec}`)
     jec = jec.cipher.pin
+    console.log(`jec=${jec}`)
 
 
 
@@ -42,7 +42,7 @@ const $ = new Env("wskey")
 
     console.log("wskey获取中！")
 
-    $notify("点击复制wskey", "",`${wskey};`);
+    $notify("点击复制wskey", "",`pt_pin=${pin};${wskey};`);
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
@@ -51,7 +51,7 @@ const $ = new Env("wskey")
 async function pinDecode(pin) {
     return new Promise(resolve => {
         $.post({
-            url: `http://pin.tsukasa.pro:7410/tt/base64Decode`,
+            url: `http://pin.tsukasa.pro/tt/base64Decode`,
             // body: `body=${encodeURIComponent(JSON.stringify({'base64':pin}))}`,
             body: `${(JSON.stringify({'base64':pin}))}`,
             headers: {
