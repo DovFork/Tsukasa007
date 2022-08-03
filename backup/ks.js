@@ -6,9 +6,9 @@
 
 const $ = new Env("ks")
 !(async () => {
-    let responseBody = $response
-    console.log(responseBody)
+    let responseBody = JSON.parse($response.body)
     console.log(JSON.stringify(responseBody))
+    $notify("点击复制", "",`${responseBody['kuaishou.api_client_salt']}&${responseBody['kuaishou.api_st']}&`);
 
 })()
     .catch((e) => $.logErr(e))
